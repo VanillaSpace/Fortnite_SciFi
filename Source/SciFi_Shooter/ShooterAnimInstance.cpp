@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "ShooterAnimInstance.h"
 #include "ShooterCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -22,7 +19,14 @@ void UShooterAnimInstance::UpdateAnimationProperties(float DeltaTime)
 		bIsInAir = ShooterCharacter->GetCharacterMovement()->IsFalling();
 
 		// Is the character accelerating?
-		bIsAccelerating = (ShooterCharacter->GetCharacterMovement()->GetCurrentAcceleration().Size() > 0.f) ? true : false;
+		if (ShooterCharacter->GetCharacterMovement()->GetCurrentAcceleration().Size() > 0.f)
+		{
+			bIsAccelerating = true;
+		}
+		else
+		{
+			bIsAccelerating = false;
+		}
 	}
 }
 
