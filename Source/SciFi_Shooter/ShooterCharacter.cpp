@@ -113,6 +113,10 @@ void AShooterCharacter::FireWeapon()
 		AnimInstance->Montage_Play(HipFireMontage);
 		AnimInstance->Montage_JumpToSection(FName("StartFire"));
 	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AnimInstance is Missing"));
+	}
 }
 
 // Called every frame
