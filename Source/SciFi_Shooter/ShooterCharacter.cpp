@@ -106,6 +106,13 @@ void AShooterCharacter::FireWeapon()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Barrel Socket is Missing"));
 	}
+
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && HipFireMontage)
+	{
+		AnimInstance->Montage_Play(HipFireMontage);
+		AnimInstance->Montage_JumpToSection(FName("StartFire"));
+	}
 }
 
 // Called every frame
