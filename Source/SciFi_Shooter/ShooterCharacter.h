@@ -74,7 +74,7 @@ private:
 		class UAnimMontage* HipFireMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
-		UParticleSystem* ImpactPointers;
+		UParticleSystem* ImpactParticles;
 
 		
 
