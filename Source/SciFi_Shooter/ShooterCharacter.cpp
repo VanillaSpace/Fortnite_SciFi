@@ -96,29 +96,72 @@ void AShooterCharacter::FireWeapon()
 	if (BarrelSocket)
 	{
 		const FTransform SocketTransform = BarrelSocket->GetSocketTransform(GetMesh());
-		if (MuzzleFlash)
+		MuzzleFlash ? UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, SocketTransform) : ErrorLogs(MuzzleFlash->GetName(), "");
+
+		FVector2D ViewportSize;
+		(GEngine && GEngine->GameViewport) ? GEngine->GameViewport->GetViewportSize(ViewportSize) : ErrorLogs(GEngine->GetName(), GEngine->GameViewport->GetName());
+
+		//Screen Space location of Crosshair
+		FVector2D CrosshairLocation(ViewportSize.X / 2.f, ViewportSize.Y / 2.f);
+		CrosshairLocation.Y -= 50.f;
+		FVector CrosshairWorldPosition;
+		FVector CrosshairWorldDirection;
+
+		bool bScreenToWorld = UGameplayStatics::DeprojectScreenToWorld(UGameplayStatics::GetPlayerController(this, 0),
+			CrosshairLocation,
+			CrosshairWorldPosition,
+			CrosshairWorldDirection);
+
+		if (bScreenToWorld == NULL)
 		{
-			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, SocketTransform);
+			UE_LOG(LogTemp, Warning, TEXT("The %b value is %s in AShooterCharacter::FireWeapon"), 
+				bScreenToWorld, 
+				(bScreenToWorld ? TEXT("true") : TEXT("false")));
 		}
-		else
+			
+		if (bScreenToWorld)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("MuzzleFlash is Missing"));
+			FHitResult ScreenTraceHit;
+			const FVector Start{ CrosshairWorldPosition };
+			const FVector End{ CrosshairWorldPosition + CrosshairWorldDirection * 50'000.f };
+			FVector BeamEndPoint{ End };
+			GetWorld()->LineTraceSingleByChannel(
+				ScreenTraceHit,
+				Start,
+				End,
+				ECollisionChannel::ECC_Visibility);
+
+			if (ScreenTraceHit.bBlockingHit)
+			{
+				BeamEndPoint = ScreenTraceHit.Location;
+				if (ImpactParticles)
+				{
+					UGameplayStatics::SpawnEmitterAtLocation(
+						GetWorld(),
+						ImpactParticles,
+						ScreenTraceHit.Location);
+				}
+			}
+			if (BeamParticles)
+			{
+				UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(
+					GetWorld(),
+					BeamParticles,
+					SocketTransform);
+				(Beam == NULL) ? ErrorLogs(Beam->GetName(), "") : Beam->SetVectorParameter(FName("Target"), BeamEndPoint);
+			}
 		}
-		
-		FHitResult FireHit;
+		/*FHitResult FireHit;
 		const FVector Start{ SocketTransform.GetLocation() };
 		const FQuat Rotation{ SocketTransform.GetRotation() };
 		const FVector RotationAxis{ Rotation.GetAxisX() };
 		const FVector End{ Start + RotationAxis * 5000.f };
-		
+
 		FVector BeamEndPoint{ End };
 
 		GetWorld()->LineTraceSingleByChannel(FireHit, Start, End, ECollisionChannel::ECC_Visibility);
 		if (FireHit.bBlockingHit)
 		{
-			//DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 2.f);
-			//DrawDebugPoint(GetWorld(), FireHit.Location, 5.f, FColor::Red, false, 2.f);
-
 			BeamEndPoint = FireHit.Location;
 
 			if (ImpactParticles)
@@ -133,11 +176,11 @@ void AShooterCharacter::FireWeapon()
 
 				Beam->SetVectorParameter(FName("Target"), BeamEndPoint);
 			}
-		}
+		}*/
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Barrel Socket is Missing"));
+		ErrorLogs(BarrelSocket->GetName(), "");
 	}
 
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
@@ -175,4 +218,17 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
 	PlayerInputComponent->BindAction("FireButton", IE_Pressed, this, &AShooterCharacter::FireWeapon);
+}
+
+// Called to for sanity check
+void AShooterCharacter::ErrorLogs(FString variable, FString variable_2 = "")
+{
+	if (variable_2.IsEmpty())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("%s is Missing in ShooterCharacter.cpp"), *variable);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("%s and %s is Missing in ShooterCharacter.cpp"), *variable, *variable_2);
+	}
 }
