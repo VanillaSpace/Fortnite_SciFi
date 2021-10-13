@@ -101,7 +101,6 @@ void AShooterCharacter::FireWeapon()
 		FVector2D ViewportSize;
 		(GEngine && GEngine->GameViewport) ? GEngine->GameViewport->GetViewportSize(ViewportSize) : ErrorLogs(GEngine->GetName(), GEngine->GameViewport->GetName());
 
-		//Screen Space location of Crosshair
 		FVector2D CrosshairLocation(ViewportSize.X / 2.f, ViewportSize.Y / 2.f);
 		CrosshairLocation.Y -= 50.f;
 		FVector CrosshairWorldPosition;
@@ -114,12 +113,11 @@ void AShooterCharacter::FireWeapon()
 
 		if (bScreenToWorld == NULL)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("The %b value is %s in AShooterCharacter::FireWeapon"), 
-				bScreenToWorld, 
+			UE_LOG(LogTemp, Warning, TEXT("The %b value is %s in AShooterCharacter::FireWeapon"),
+				bScreenToWorld,
 				(bScreenToWorld ? TEXT("true") : TEXT("false")));
 		}
-			
-		if (bScreenToWorld)
+		else
 		{
 			FHitResult ScreenTraceHit;
 			const FVector Start{ CrosshairWorldPosition };
@@ -134,13 +132,10 @@ void AShooterCharacter::FireWeapon()
 			if (ScreenTraceHit.bBlockingHit)
 			{
 				BeamEndPoint = ScreenTraceHit.Location;
-				if (ImpactParticles)
-				{
-					UGameplayStatics::SpawnEmitterAtLocation(
-						GetWorld(),
-						ImpactParticles,
-						ScreenTraceHit.Location);
-				}
+				ImpactParticles == NULL ? ErrorLogs(ImpactParticles->GetName(), "") : UGameplayStatics::SpawnEmitterAtLocation(
+					GetWorld(),
+					ImpactParticles,
+					ScreenTraceHit.Location);
 			}
 			if (BeamParticles)
 			{
@@ -149,6 +144,10 @@ void AShooterCharacter::FireWeapon()
 					BeamParticles,
 					SocketTransform);
 				(Beam == NULL) ? ErrorLogs(Beam->GetName(), "") : Beam->SetVectorParameter(FName("Target"), BeamEndPoint);
+			}
+			else
+			{
+				ErrorLogs(BeamParticles->GetName(), "");
 			}
 		}
 		/*FHitResult FireHit;
@@ -191,7 +190,7 @@ void AShooterCharacter::FireWeapon()
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("AnimInstance is Missing"));
+		ErrorLogs(AnimInstance->GetName(), HipFireMontage->GetName());
 	}
 }
 
