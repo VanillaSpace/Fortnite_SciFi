@@ -132,11 +132,27 @@ void AShooterCharacter::FireWeapon()
 			if (ScreenTraceHit.bBlockingHit)
 			{
 				BeamEndPoint = ScreenTraceHit.Location;
-				ImpactParticles == NULL ? ErrorLogs(ImpactParticles->GetName(), "") : UGameplayStatics::SpawnEmitterAtLocation(
-					GetWorld(),
-					ImpactParticles,
-					ScreenTraceHit.Location);
 			}
+
+			FHitResult WeaponTraceHit; 
+			const FVector WeaponTraceStart{ SocketTransform.GetLocation() };
+			const FVector WeaponTraceEnd{ BeamEndPoint };
+			GetWorld()->LineTraceSingleByChannel(
+				WeaponTraceHit,
+				WeaponTraceStart,
+				WeaponTraceEnd,
+				ECollisionChannel::ECC_Visibility);
+
+			if (WeaponTraceHit.bBlockingHit) //object between barrel and BeamEndPoint?
+			{
+				BeamEndPoint = WeaponTraceHit.Location;
+			}
+
+			(ImpactParticles == NULL) ? ErrorLogs(ImpactParticles->GetName(), "") : UGameplayStatics::SpawnEmitterAtLocation(
+				GetWorld(),
+				ImpactParticles,
+				BeamEndPoint);
+
 			if (BeamParticles)
 			{
 				UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(
