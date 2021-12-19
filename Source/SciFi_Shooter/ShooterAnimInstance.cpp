@@ -55,17 +55,17 @@ void UShooterAnimInstance::UpdateAnimationProperties(float DeltaTime)
 					FString::Printf(
 						TEXT("Movement Rotation: %f"),
 						MovementRotation.Yaw);*/
-						/*
-						FString OffsetMessage =
-							FString::Printf(
-								TEXT("Movement Offset Yaw: %f"),
-								MovementOffsetYaw);*/
+						
+						//FString offsetmessage =
+						//	FString::Printf(
+						//		TEXT("movement offset yaw: %f"),
+						//		MovementOffsetYaw);
 
-								/*
-								if (GEngine)
-								{
-									GEngine->AddOnScreenDebugMessage(1, 0.f, FColor::White, OffsetMessage);
-								}*/
+						//	
+						//		if (GEngine)
+						//		{
+						//			GEngine->AddOnScreenDebugMessage(1, 0.f, FColor::White, offsetmessage);
+						//		}
 	}
 }
 
