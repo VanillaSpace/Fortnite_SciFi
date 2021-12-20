@@ -308,6 +308,19 @@ void AShooterCharacter::SetLookRates()
 	}
 }
 
+
+void AShooterCharacter::CalculateCrosshairSpread(float DeltaTime)
+{
+	FVector2D WalkSpeedRange{ 0.f, 600.f };
+	FVector2D VelocityMultiplerRange{ 0.f, 1.f };
+	FVector Velocity{ GetVelocity() };
+	Velocity.Z = 0.f;
+
+	CrosshairVelocityFactor = FMath::GetMappedRangeValueClamped(WalkSpeedRange, VelocityMultiplerRange, Velocity.Size());
+
+	CrosshairSpreadMultiplier = 0.5f + CrosshairVelocityFactor;
+}
+
 // Called every frame
 void AShooterCharacter::Tick(float DeltaTime)
 {
@@ -315,6 +328,8 @@ void AShooterCharacter::Tick(float DeltaTime)
 
 	CameraInterpZoom(DeltaTime);
 
+	//Calculate crosshair spread multiplier
+	CalculateCrosshairSpread(DeltaTime);
 }
 
 // Called to bind functionality to input
@@ -354,4 +369,9 @@ void AShooterCharacter::ErrorLogs(FString variable, FString variable_2 = "")
 	{
 		UE_LOG(LogTemp, Warning, TEXT("%s and %s is Missing in ShooterCharacter.cpp"), *variable, *variable_2);
 	}
+}
+
+float AShooterCharacter::GetCrosshairSpreadMultiplier() const
+{
+	return CrosshairSpreadMultiplier;
 }
