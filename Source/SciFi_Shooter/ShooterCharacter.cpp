@@ -37,7 +37,10 @@ AShooterCharacter::AShooterCharacter() :
 	CrosshairSpreadMultiplier(0.f),
 	CrosshairVelocityFactor(0.f),
 	CrosshairInAirFactor(0.f),
-	CrosshairAimFactor(0.f)
+	CrosshairAimFactor(0.f),
+	//Bullet fire timer variables
+	ShootTimeDuration(0.05f),
+	bFiringBullet(false)
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -195,10 +198,9 @@ void AShooterCharacter::FireWeapon()
 		AnimInstance->Montage_Play(HipFireMontage);
 		AnimInstance->Montage_JumpToSection(FName("StartFire"));
 	}
-	else
-	{
-		ErrorLogs(AnimInstance->GetName(), HipFireMontage->GetName());
-	}
+	
+	//Start bullet fire timer for crosshair
+	StartCrosshairBulletFire();
 }
 
 bool AShooterCharacter::GetBeamEndLocation(const FVector& MuzzleSocketLocation, FVector& OutBeamLocation)
@@ -207,7 +209,6 @@ bool AShooterCharacter::GetBeamEndLocation(const FVector& MuzzleSocketLocation, 
 	(GEngine && GEngine->GameViewport) ? GEngine->GameViewport->GetViewportSize(ViewportSize) : ErrorLogs(GEngine->GetName(), GEngine->GameViewport->GetName());
 
 	FVector2D CrosshairLocation(ViewportSize.X / 2.f, ViewportSize.Y / 2.f);
-	CrosshairLocation.Y -= 50.f;
 	FVector CrosshairWorldPosition;
 	FVector CrosshairWorldDirection;
 
@@ -333,7 +334,26 @@ void AShooterCharacter::CalculateCrosshairSpread(float DeltaTime)
 	float DefaultAim = FMath::FInterpTo(CrosshairAimFactor, 0.f, DeltaTime, 30.f);
 	CrosshairAimFactor = bAiming ? OnAim : DefaultAim;
 	
-	CrosshairSpreadMultiplier = 0.5f + CrosshairVelocityFactor + CrosshairInAirFactor - CrosshairAimFactor;
+	// True after 0.05 seconds after firing
+	float Firing = FMath::FInterpTo(CrosshairShootingFactor, 0.3f, DeltaTime, 60.f);
+	float NotFiring = FMath::FInterpTo(CrosshairShootingFactor, 0.f, DeltaTime, 60.f);
+	CrosshairShootingFactor = bFiringBullet ? Firing : NotFiring;
+
+	CrosshairSpreadMultiplier = 0.5f + CrosshairVelocityFactor + CrosshairInAirFactor - CrosshairAimFactor + CrosshairShootingFactor;
+}
+
+
+void AShooterCharacter::StartCrosshairBulletFire()
+{
+	bFiringBullet = true; 
+
+	GetWorldTimerManager().SetTimer(CrosshairShootTimer, this, &AShooterCharacter::FinishCrosshairBulletFire, ShootTimeDuration);
+}
+
+
+void AShooterCharacter::FinishCrosshairBulletFire()
+{
+	bFiringBullet = false;
 }
 
 // Called every frame
