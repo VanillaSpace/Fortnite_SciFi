@@ -32,12 +32,16 @@ AShooterCharacter::AShooterCharacter() :
 	CameraDefaultFOV(0.f), //Set in BeginPlay
 	CameraZoomedFOV(35.f),
 	CameraCurrentFOV(0.f),
-	ZoomInterpSpeed(20.f), 
+	ZoomInterpSpeed(20.f),
 	//Crosshair spread factors
 	CrosshairSpreadMultiplier(0.f),
 	CrosshairVelocityFactor(0.f),
 	CrosshairInAirFactor(0.f),
 	CrosshairAimFactor(0.f),
+	// Automatic Gun fire Rate
+	AutomaticFireRate(0.1f),
+	bShouldFire(true),
+	bFireButtonPressed(false),
 	//Bullet fire timer variables
 	ShootTimeDuration(0.05f),
 	bFiringBullet(false)
@@ -384,7 +388,9 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
 	PlayerInputComponent->BindAction("FireButton", IE_Pressed, this, 
-		&AShooterCharacter::FireWeapon);
+		&AShooterCharacter::FireButtonPressed);
+	PlayerInputComponent->BindAction("FireButton", IE_Released, this,
+		&AShooterCharacter::FireButtonReleased);
 
 	PlayerInputComponent->BindAction("AimingButton", IE_Pressed, this, 
 		&AShooterCharacter::AimingButtonPressed);
@@ -403,6 +409,40 @@ void AShooterCharacter::ErrorLogs(FString variable, FString variable_2 = "")
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("%s and %s is Missing in ShooterCharacter.cpp"), *variable, *variable_2);
+	}
+}
+
+
+void AShooterCharacter::FireButtonPressed()
+{
+	bFireButtonPressed = true;
+	StartFireTimer();
+}
+
+
+void AShooterCharacter::FireButtonReleased()
+{
+	bFireButtonPressed = false;
+}
+
+
+void AShooterCharacter::StartFireTimer()
+{
+	if (bShouldFire)
+	{
+		FireWeapon();
+		bShouldFire = false;
+		GetWorldTimerManager().SetTimer(AutoFireTimer, this, &AShooterCharacter::AutoFireReset, AutomaticFireRate);
+	}
+}
+
+
+void AShooterCharacter::AutoFireReset()
+{
+	bShouldFire = true;
+	if (bFireButtonPressed)
+	{
+		StartFireTimer();
 	}
 }
 
