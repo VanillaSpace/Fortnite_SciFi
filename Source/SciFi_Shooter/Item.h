@@ -19,9 +19,31 @@ protected:
 	
 	virtual void BeginPlay() override;
 
+	UFUNCTION()
+		void OnSphereOverlap(
+			UPrimitiveComponent* OverlappedComponent,
+			AActor* OtherActor,
+			UPrimitiveComponent* OtherComp,
+			int32 OtherBodyIndex,
+			bool bFromSweep,
+			const FHitResult& SweepResult);
+
+	/** Called when End Overlapping AreaSphere */
+	UFUNCTION()
+		void OnSphereEndOverlap(
+			UPrimitiveComponent* OverlappedComponent,
+			AActor* OtherActor,
+			UPrimitiveComponent* OtherComp,
+			int32 OtherBodyIndex);
+
 public:	
 	
 	virtual void Tick(float DeltaTime) override;
+
+	UPROPERTY(EditAnywhere, Category = "Item Effects")
+	float ZValue;
+
+	float RunningTime;
 
 private: 
 	// Skeletal Mesh for the item
@@ -35,7 +57,12 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
 	class UWidgetComponent* PickupWidget;
 
-public: 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
+	class USphereComponent* AreaSphere;
 
+	void FloatingEffect(float DeltaTime);
+
+public: 
+	FORCEINLINE UWidgetComponent* GetPickupWidget() const { return PickupWidget; }
 
 };
