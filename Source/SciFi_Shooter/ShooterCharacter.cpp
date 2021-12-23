@@ -475,6 +475,7 @@ void AShooterCharacter::TraceForItems()
 				// Show Item's Pickup Widget
 				UE_LOG(LogTemp, Warning, TEXT("Item: %i"), HitItem);
 				HitItem->GetPickupWidget()->SetVisibility(true);
+				HitItem->bCanHighlight = true;
 			}
 		}
 	}

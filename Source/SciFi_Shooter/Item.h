@@ -45,6 +45,9 @@ public:
 
 	float RunningTime;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Effects")
+	bool bCanHighlight = false;
+
 private: 
 	// Skeletal Mesh for the item
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
