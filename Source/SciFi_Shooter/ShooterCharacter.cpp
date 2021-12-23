@@ -470,12 +470,12 @@ void AShooterCharacter::TraceForItems()
 		if (ItemTraceResult.bBlockingHit)
 		{
 			AItem* HitItem = Cast<AItem>(ItemTraceResult.Actor);
-			if (HitItem)
+			if (HitItem && HitItem->GetPickupWidget() && HitItem->GetItemMesh())
 			{
-				// Show Item's Pickup Widget
+				// Show Item's Pickup Widget & highlight
 				UE_LOG(LogTemp, Warning, TEXT("Item: %i"), HitItem);
 				HitItem->GetPickupWidget()->SetVisibility(true);
-				HitItem->bCanHighlight = true;
+				HitItem->GetItemMesh()->SetRenderCustomDepth(true);				
 			}
 		}
 	}

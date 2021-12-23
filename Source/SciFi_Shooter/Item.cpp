@@ -60,7 +60,7 @@ void AItem::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor*
 		{
 			ShooterCharacter->IncrementOverlappedItemCount(-1);
 			PickupWidget->SetVisibility(false);
-			bCanHighlight = false;
+			ItemMesh->SetRenderCustomDepth(false);
 		}
 	}
 }

@@ -10,13 +10,13 @@ UCLASS()
 class SCIFI_SHOOTER_API AItem : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 
 	AItem();
 
 protected:
-	
+
 	virtual void BeginPlay() override;
 
 	UFUNCTION()
@@ -36,36 +36,38 @@ protected:
 			UPrimitiveComponent* OtherComp,
 			int32 OtherBodyIndex);
 
-public:	
-	
+public:
+
 	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(EditAnywhere, Category = "Item Effects")
-	float ZValue;
+		float ZValue;
 
 	float RunningTime;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Effects")
-	bool bCanHighlight = false;
+		bool bCanHighlight = false;
 
-private: 
+private:
 	// Skeletal Mesh for the item
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* ItemMesh;
+		USkeletalMeshComponent* ItemMesh;
 
 	// Line trace colliders with box to show HUD
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
-	class UBoxComponent* CollisionBox;
+		class UBoxComponent* CollisionBox;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
-	class UWidgetComponent* PickupWidget;
+		class UWidgetComponent* PickupWidget;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
-	class USphereComponent* AreaSphere;
+		class USphereComponent* AreaSphere;
 
 	void FloatingEffect(float DeltaTime);
 
-public: 
+public:
 	FORCEINLINE UWidgetComponent* GetPickupWidget() const { return PickupWidget; }
+
+	FORCEINLINE USkeletalMeshComponent* GetItemMesh() const { return ItemMesh;  }
 
 };
