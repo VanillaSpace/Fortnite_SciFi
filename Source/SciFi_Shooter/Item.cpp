@@ -6,6 +6,7 @@
 #include "Components/WidgetComponent.h"
 #include "Components/SphereComponent.h"
 #include "ShooterCharacter.h"
+#include <Math/Rotator.h>
 
 // Sets default values
 AItem::AItem()
@@ -71,6 +72,8 @@ void AItem::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	FloatingEffect(DeltaTime);
+
+	RotatingEffect(RotatingValue);
 }
 
 void AItem::FloatingEffect(float DeltaTime)
@@ -84,5 +87,10 @@ void AItem::FloatingEffect(float DeltaTime)
 	RunningTime += DeltaTime;
 
 	SetActorLocation(NewLocation);
+}
+
+void AItem::RotatingEffect(FRotator RotationValue)
+{
+	AddActorLocalRotation(RotationValue);
 }
 

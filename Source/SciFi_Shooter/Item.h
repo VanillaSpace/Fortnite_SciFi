@@ -41,12 +41,15 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(EditAnywhere, Category = "Item Effects")
-		float ZValue;
+	float ZValue;
+
+	UPROPERTY(EditAnywhere, Category = "Item Effects")
+	FRotator RotatingValue;
 
 	float RunningTime;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Effects")
-		bool bCanHighlight = false;
+	bool bCanHighlight = false;
 
 private:
 	// Skeletal Mesh for the item
@@ -64,6 +67,8 @@ private:
 		class USphereComponent* AreaSphere;
 
 	void FloatingEffect(float DeltaTime);
+
+	void RotatingEffect(FRotator RotationValue);
 
 public:
 	FORCEINLINE UWidgetComponent* GetPickupWidget() const { return PickupWidget; }
